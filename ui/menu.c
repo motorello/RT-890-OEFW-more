@@ -308,26 +308,29 @@ void UI_DrawTxPriority(void)
 
 void UI_DrawFrequencyStep(uint8_t Index)
 {
-	static const char Mode[15][5] = {
-			"0.25K",
-			"1.25K",
-			"2.5K ",
-			"5K   ",
-			"6.25K",
-			"10K  ",
-			"12.5K",
-			"20K  ",
-			"25K  ",
-			"50K  ",
-			"100K ",
-			"500K ",
-			"1M   ",
-			"5M   ",
-			"0.01K",
+	#define MENU_STEPS_COUNT  16
+	#define MENU_STEPS_LENGTH 8
+	static const char Mode[MENU_STEPS_COUNT][MENU_STEPS_LENGTH] = {
+		"10 Hz   ",
+		"250 Hz  ",
+		"1.25 kHz",
+		"2.5 kHz ",
+		"5 kHz   ",
+		"6.25 kHz",
+		"8.33 kHz",
+		"10 kHz  ",
+		"12.5 kHz",
+		"20 kHz  ",
+		"25 kHz  ",
+		"50 kHz  ",
+		"100 kHz ",
+		"500 kHz ",
+		"1 MHz   ",
+		"5 MHz   ",
 	};
 
-	UI_DrawSettingOptionEx(Mode[Index], 5, 0);
-	UI_DrawSettingOptionEx(Mode[(Index + 1) % 14], 5, 1);
+	UI_DrawSettingOptionEx(Mode[Index], MENU_STEPS_LENGTH, 0);
+	UI_DrawSettingOptionEx(Mode[(Index + 1) % MENU_STEPS_COUNT], MENU_STEPS_LENGTH, 1);
 }
 
 void UI_DrawTimer(uint8_t Index)

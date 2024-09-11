@@ -71,20 +71,22 @@ uint8_t COLOR_G;
 uint8_t COLOR_B;
 uint16_t COLOR_BAR;
 
-
-static const char StepStrings[][5] = {
+#define SPECTRUM_STEPS_COUNT 16
+static const char StepStrings[SPECTRUM_STEPS_COUNT][5] = {
+	"0.01K",
 	"0.25K",
 	"1.25K",
 	"2.50K",
 	"5.00K",
 	"6.25K",
+	"8.33K",
 	"10.0K",
 	"12.5K",
 	"20.0K",
 	"25.0K",
 	"50.0K",
-	"100.K",
-	"500.K",
+	" 100K",
+	" 500K",
 	"1.00M",
 	"5.00M"
 };
@@ -181,14 +183,14 @@ void IncrementStepIndex(void) {
 }
 
 void IncrementFreqStepIndex(void) {
-	CurrentFreqStepIndex = (CurrentFreqStepIndex + 1) % 10;
+	CurrentFreqStepIndex = (CurrentFreqStepIndex + 1) % SPECTRUM_STEPS_COUNT;
 	CurrentFreqStep = FREQUENCY_GetStep(CurrentFreqStepIndex);
 	SetFreqMinMax();
 	DrawLabels();
 }
 
 void DecrementFreqStepIndex(void) {
-	CurrentFreqStepIndex = (CurrentFreqStepIndex - 1) % 10;
+	CurrentFreqStepIndex = (CurrentFreqStepIndex - 1) % SPECTRUM_STEPS_COUNT;
 	CurrentFreqStep = FREQUENCY_GetStep(CurrentFreqStepIndex);
 	SetFreqMinMax();
 	DrawLabels();
