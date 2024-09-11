@@ -75,8 +75,8 @@ uint16_t COLOR_BAR;
 static const char StepStrings[][5] = {
 	"0.25K",
 	"1.25K",
-	"02.5K",
-	"05.0K",
+	"2.50K",
+	"5.00K",
 	"6.25K",
 	"10.0K",
 	"12.5K",
@@ -110,7 +110,7 @@ void DrawCurrentFreq(uint16_t Color) {
 	gShortString[3] = '.';
 	UI_DrawSmallString(54, 70, gShortString, 8);// Main Frequency
 	gColorForeground = COLOR_FOREGROUND;
-	UI_DrawSmallString(106, 70, Mode[CurrentModulation], 2);// AM, FM, SB
+	UI_DrawSmallString(106, 70, Mode[CurrentModulation], 2);// FM, AM, SB
 }
 
 void DrawLabels(void) {
@@ -182,6 +182,13 @@ void IncrementStepIndex(void) {
 
 void IncrementFreqStepIndex(void) {
 	CurrentFreqStepIndex = (CurrentFreqStepIndex + 1) % 10;
+	CurrentFreqStep = FREQUENCY_GetStep(CurrentFreqStepIndex);
+	SetFreqMinMax();
+	DrawLabels();
+}
+
+void DecrementFreqStepIndex(void) {
+	CurrentFreqStepIndex = (CurrentFreqStepIndex - 1) % 10;
 	CurrentFreqStep = FREQUENCY_GetStep(CurrentFreqStepIndex);
 	SetFreqMinMax();
 	DrawLabels();
@@ -400,7 +407,7 @@ void CheckKeys(void) {
 			KeyHoldTimer++;
 		}
 	}
-	if (Key != LastKey || KeyHoldTimer >= 50) {
+	if (Key != LastKey || KeyHoldTimer >= 100) {
 		KeyHoldTimer = 0;
 		switch (Key) {
 			case KEY_NONE:
@@ -429,6 +436,8 @@ void CheckKeys(void) {
 				IncrementStepIndex();
 				break;
 			case KEY_2:
+				bHold ^= 1;
+				DrawLabels();
 				break;
 			case KEY_3:
 				IncrementModulation();
@@ -443,8 +452,7 @@ void CheckKeys(void) {
 				ChangeSquelchLevel(TRUE);
 				break;
 			case KEY_7:
-				bHold ^= 1;
-				DrawLabels();
+				DecrementFreqStepIndex();
 				break;
 			case KEY_8:
 				break;
@@ -637,7 +645,7 @@ void APP_Spectrum(void) {
 	CurrentFreqStepIndex = gSettings.FrequencyStep;
 	CurrentFreqStep = FREQUENCY_GetStep(CurrentFreqStepIndex);
 	CurrentStepCountIndex = STEPS_128;
-	CurrentScanDelay = 4;
+	CurrentScanDelay = 2;
 	bFilterEnabled = TRUE;
 	SquelchLevel = 0;
 	BarScale = 40;
@@ -654,6 +662,7 @@ void APP_Spectrum(void) {
 	}
 	
 	DISPLAY_Fill(0, 159, 1, 96, COLOR_BACKGROUND);
+	DELAY_WaitMS(300); // let the key pressed for entering the spectrum app be un-pressed
 	Spectrum_Loop();
 
 	StopSpectrum();
