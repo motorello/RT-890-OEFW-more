@@ -39,38 +39,32 @@
 #include "ui/version.h"
 
 static const char Menu[][14] = {
-	"Startup Logo  ",
-	"Cell Voltage  ",
-	"Startup Tone  ",
-	"Startup Text  ",
-	"Voice Prompt  ",
-	"Key Beep      ",
-	"TX Tone       ",
-	"Dual Display  ",
-	"TX Priority   ",
-	"Power Save    ",
-	"Freq Step     ",
+	// everyday usen features
 	"Squelch Level ",
-	"Backlight     ",
-	"Lock Time     ",
-	"Time Of Talk  ",
-	"VOX Level     ",
-	"VOX Delay     ",
-	"NOAA Monitor  ",
-	"FM Standby    ",
-	"Tail Tone     ",
-	"Scan >>>      ",
-	"FSK ID        ",
+	"Freq Step     ",
+	"TX Power      ",
+	"Mic Gain      ",
 	"Repeater Mode ",
-	"Scan Resume   ",
-	"Scan LED      ",
 	"CTCSS/DCS     ",
 	"RX CTCSS/DCS  ",
 	"TX CTCSS/DCS  ",
-	"TX Power      ",
-	"Mic Gain      ",
+	"DCS Encrypt   ",
+	"Tail Tone     ",
 	"Modulation    ",
 	"Bandwidth     ",
+	
+	// often used features
+	"Dual Display  ",
+	"TX Priority   ",
+	"TX Tone       ",
+	"FSK ID        ",
+	"Backlight     ",
+	"Key Beep      ",
+
+	// scan features	
+	"Scan Direction",
+	"Scan Resume   ",
+	"Scan LED      ",
 	"List To Scan  ",
 	"Ch In List 1  ",
 	"Ch In List 2  ",
@@ -80,13 +74,13 @@ static const char Menu[][14] = {
 	"Ch In List 6  ",
 	"Ch In List 7  ",
 	"Ch In List 8  ",
-	"Busy Lock     ",
-	"Invert Speech ",
-	"DCS Encrypt   ",
-	"Mute Code     ",
+	
+	// channel naming features
 	"Channel Name  ",
 	"Save Channel  ",
 	"Delete Channel",
+
+	// customization features
 	"Side 1 Long   ",
 	"Side 1 Short  ",
 	"Side 2 Long   ",
@@ -106,12 +100,33 @@ static const char Menu[][14] = {
 	"Key Menu Long ",
 	"Key Exit Long ",
 	"Reset Keys    ",
+
+	// once-in-a-while used features
+	"Power Save    ",
+	"Scrambled TX  ",
+	"Busy Lock     ",	
+	"Mute Code     ",
+	"Lock Time     ",
+	"Time Of Talk  ",
+	"VOX Level     ",
+	"VOX Delay     ",
+	"NOAA Monitor  ",
+	"FM Standby    ",
+
+	// dtmf features
 	"DTMF Delay    ",
 	"DTMF Interval ",
 	"DTMF Mode     ",
 	"DTMF Select   ",
 	"DTMF Display  ",
+	
+	// one-time used features
 	"Dark Theme    ",
+	"Startup Logo  ",
+	"Cell Voltage  ",
+	"Startup Tone  ",
+	"Startup Text  ",
+	"Voice Prompt  ",
 	"Initialize    ",
 	"Version       ",
 };
@@ -155,15 +170,22 @@ uint8_t gSettingsCount = sizeof(Menu) / sizeof(Menu[0]);
 
 static void DrawMenu(uint8_t Index)
 {
+	gColorForeground = COLOR_GREY;
 	UI_DrawString(24, 72, Menu[(Index + gSettingsCount - 1) % gSettingsCount], 14);
 	Int2Ascii(((Index + gSettingsCount - 1) % gSettingsCount) + 1, 2);
 	UI_DrawString(140, 72, gShortString, 2);
+
+	gColorForeground = COLOR_FOREGROUND;
 	UI_DrawString(24, 48, Menu[Index], 14);
 	Int2Ascii(Index + 1, 2);
 	UI_DrawString(140, 48, gShortString, 2);
+
+	gColorForeground = COLOR_GREY;
 	UI_DrawString(24, 24, Menu[(Index + 1) % gSettingsCount], 14);
 	Int2Ascii(((Index + 1) % gSettingsCount) + 1, 2);
 	UI_DrawString(140, 24, gShortString, 2);
+
+	gColorForeground = COLOR_FOREGROUND;
 }
 
 static void EnableTextEditor(void)
@@ -772,7 +794,7 @@ void MENU_DrawSetting(void)
 
 	case MENU_FREQ_STEP:
 		gSettingCurrentValue = gSettings.FrequencyStep;
-		gSettingMaxValues = 15;
+		gSettingMaxValues = 16;
 		DISPLAY_Fill(0, 159, 1, 55, COLOR_BACKGROUND);
 		UI_DrawFrequencyStep(gSettingCurrentValue);
 		break;
