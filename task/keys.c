@@ -21,6 +21,7 @@
 #include "driver/audio.h"
 #include "driver/beep.h"
 #include "driver/key.h"
+#include "driver/delay.h"
 #include "helper/dtmf.h"
 #include "helper/helper.h"
 #include "helper/inputbox.h"
@@ -384,6 +385,7 @@ static void HandlerLong(KEY_t Key)
 			do {
 				if (gScreenMode == SCREEN_MENU) {
 					MENU_Next(Key);
+					DELAY_WaitMS(70);
 				} else if (gScreenMode == SCREEN_SETTING) {
 					MENU_ScrollSetting(Key);
 				}
