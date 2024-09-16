@@ -205,10 +205,11 @@ static void EnableTextEditor(void)
 
 static void DrawSettingName(uint8_t Index)
 {
-	gColorForeground = COLOR_FOREGROUND;
+	gColorForeground = COLOR_GREY;
 	UI_DrawString(24, 72, Menu[Index], 14);
 	Int2Ascii((Index + 1), 2);
 	UI_DrawString(140, 72, gShortString, 2);
+	//UI_DrawSmallString(140, 72, gShortString, 2);
 	gColorForeground = COLOR_FOREGROUND;
 }
 
