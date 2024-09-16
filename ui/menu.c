@@ -137,62 +137,62 @@ void UI_DrawDtmfDelay(uint8_t Delay)
 
 void UI_DrawActions(uint8_t Index)
 {
-	static const char Actions[][12] = {
-		"None        ",
-		"Monitor     ",
-		"Freq Detect ",
-		"Repeat Mode ",
-		"Preset CH   ",
-		"Local Alarm ",
-		"Remote Alarm",
+	static const char Actions[][13] = {
+		"None         ",
+		"Monitor      ",
+		"Freq Detect  ",
+		"Repeater Mode",
+		"Preset CH    ",
+		"Local Alarm  ",
+		"Remote Alarm ",
 #ifdef ENABLE_NOAA
-		"NOAA        ",
+		"NOAA         ",
 #else
-		"[DISABLED]  ",
+		"[DISABLED]   ",
 #endif
-		"Send Tone   ",
-		"TX Tone     ",
-		"FM Radio    ",
-		"Freq Scanner",
-		"Flashlight  ",
+		"Send Tone    ",
+		"TX Tone      ",
+		"FM Radio     ",
+		"Freq Scanner ",
+		"Flashlight   ",
 #ifdef ENABLE_AM_FIX
-		"AM Fix      ",
+		"AM Fix       ",
 #else
-		"[DISABLED]  ",
+		"[DISABLED]   ",
 #endif
-		"VOX         ",
-		"TX Power    ",
-		"Squelch     ",
-		"Dual Standby",
-		"Backlight   ",
-		"Freq Step   ",
-		"Key Beep    ",
-		"Toggle SList",
-		"DTMF Input  ",
-		"Dual Display",
-		"TX Frequency",
-		"Lock        ",
-		#ifdef ENABLE_SPECTRUM
-		"Spectrum    ",
+		"VOX          ",
+		"TX Power     ",
+		"Squelch      ",
+		"Dual Standby ",
+		"Backlight    ",
+		"Freq Step    ",
+		"Key Beep     ",
+		"Toggle SList ",
+		"DTMF Input   ",
+		"Dual Display ",
+		"TX Frequency ",
+		"Lock         ",
+#ifdef ENABLE_SPECTRUM
+		"Spectrum     ",
 #else
-		"[DISABLED]  ",
+		"[DISABLED]   ",
 #endif
-		"Dark Theme  ",
-		"RF Gain     ",
+		"Dark Theme   ",
+		"RF Gain      ",
 #ifdef ENABLE_REGISTER_EDIT
-		"Reg Editor  ",
+		"Reg Editor   ",
 #else
-		"[DISABLED]  ",
+		"[DISABLED]   ",
 #endif
-		"Mic Gain    ",
-		"Modulation  ",
-		"Bandwidth   ",
-		"TX CTCSS/DCS",
-		"TX Priority ",
+		"Mic Gain     ",
+		"Modulation   ",
+		"Bandwidth    ",
+		"TX CTCSS/DCS ",
+		"TX Priority  ",
 	};
 
-	UI_DrawSettingOptionEx(Actions[Index], 12, 0);
-	UI_DrawSettingOptionEx(Actions[(Index + 1) % ACTIONS_COUNT], 12, 1);
+	UI_DrawSettingOptionEx(Actions[Index], 13, 0);
+	UI_DrawSettingOptionEx(Actions[(Index + 1) % ACTIONS_COUNT], 13, 1);
 }
 
 void UI_DrawChannelName(uint16_t Channel)
