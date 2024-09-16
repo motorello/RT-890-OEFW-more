@@ -22,7 +22,8 @@
 void UI_DrawVersion(void)
 {
 	DISPLAY_Fill(0, 159, 1, 55, COLOR_BACKGROUND);
-	UI_DrawString(24, 48, "M7OCM V2.2.1", 12);
-	UI_DrawString(24, 24, "OHW PCB V2.0", 12);
+	//UI_DrawSmallString(24, 48, FW_VERSION_STAMP, 15);
+	UI_DrawString(24, 48, FW_VERSION_STAMP, 15);
+	UI_DrawString(24, 24, HW_VERSION_STAMP, 15);
 }
 

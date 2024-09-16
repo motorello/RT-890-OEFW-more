@@ -1,5 +1,8 @@
 TARGET = firmware
 
+FW_VERSION_STAMP ?= "M7OCM V2.2.1.2 " # it has to be exactly 15 chars
+HW_VERSION_STAMP ?= "OHW PCB V2.0   "
+
 UART_DEBUG				 ?= 0
 MOTO_STARTUP_TONE		 ?= 1
 ENABLE_AM_FIX			 ?= 1
@@ -189,6 +192,9 @@ INC += -I $(SDK)/libraries/drivers/inc/
 LIBS =
 
 DEPS = $(OBJS:.o=.d)
+
+CFLAGS += -DFW_VERSION_STAMP='$(FW_VERSION_STAMP)'
+CFLAGS += -DHW_VERSION_STAMP='$(HW_VERSION_STAMP)'
 
 ifeq ($(UART_DEBUG),1)
 	CFLAGS += -DUART_DEBUG
