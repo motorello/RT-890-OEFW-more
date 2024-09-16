@@ -62,7 +62,11 @@ void UI_DrawVfo(uint8_t Vfo)
 		UI_DrawFrequency(gVfoState[Vfo].TX.Frequency, Vfo, COLOR_RED);
 		UI_DrawCss(gVfoState[Vfo].TX.CodeType, gVfoState[Vfo].TX.Code, gVfoState[Vfo].Encrypt, gVfoState[Vfo].bMuteEnabled, Vfo);
 	} else {
-		UI_DrawFrequency(gVfoInfo[Vfo].Frequency, Vfo, gColorForeground);
+		if (gRadioMode == RADIO_MODE_RX) {
+			UI_DrawFrequency(gVfoInfo[Vfo].Frequency, Vfo, COLOR_GREEN);
+		} else {
+			UI_DrawFrequency(gVfoInfo[Vfo].Frequency, Vfo, gColorForeground);
+		}
 		UI_DrawCss(gVfoInfo[Vfo].CodeType, gVfoInfo[Vfo].Code, gVfoState[Vfo].Encrypt, gVfoState[Vfo].bMuteEnabled, Vfo);
 	}
 
