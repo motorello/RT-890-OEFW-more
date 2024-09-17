@@ -541,11 +541,14 @@ void CHANNELS_UpdateVFO(void)
 			) {
 		if (!gFrequencyReverse) {
 			gVfoState[gSettings.CurrentVfo].RX.Frequency = Frequency;
-			// if (Frequency < 13600000) {
-			// 	gVfoState[gSettings.CurrentVfo].gModulationType = 1;
-			// } else {
-			// 	gVfoState[gSettings.CurrentVfo].gModulationType = 0;
-			// }
+#ifdef ENABLE_AUTO_SWITCH_AM
+			if (Frequency >= 10800000 && Frequency <= 13600000) {
+				// auto-switch to AM if we are in airband
+				gVfoState[gSettings.CurrentVfo].gModulationType = 1;
+			} else {
+				gVfoState[gSettings.CurrentVfo].gModulationType = 0;
+			}
+#endif
 		}
 		gVfoState[gSettings.CurrentVfo].TX.Frequency = Frequency;
 		CHANNELS_SaveChannel(gSettings.CurrentVfo ? 1000 : 999, &gVfoState[gSettings.CurrentVfo]);
