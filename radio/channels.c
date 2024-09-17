@@ -412,7 +412,7 @@ void CHANNELS_NextChannelVfo(uint8_t Key)
 		// try to properly handle the 8.33 kHz step: since the .33 is periodic, theoretically every 3 steps of .33 we should fall into 1.0
 		// this piece of code handles the scan mode. The manual mode is handled in 'radio/channels.c', line 561
 		// TODO: create a dedicated function for the two identical calls
-		if (FREQUENCY_GetStep(gSettings.FrequencyStep) == 833) {
+		if (gFrequencyStep == 833) {
 			if (pInfo->RX.Frequency % 10 == 1)
 				pInfo->RX.Frequency -= 1; // eg: 126.97501 -> 126.97500
 			if (pInfo->RX.Frequency % 10 == 9)
@@ -557,7 +557,7 @@ void CHANNELS_UpdateVFO(void)
 #ifdef ENABLE_833_RETUNE
 			// try to properly handle the 8.33 kHz step: since the .33 is periodic, theoretically every 3 steps of .33 we should fall into 1.0
 			// this piece of code handles the manually input frequency. The scan mode is handled in 'radio/channels.c', line 407
-			if (FREQUENCY_GetStep(gSettings.FrequencyStep) == 833) {
+			if (gFrequencyStep == 833) {
 				if (Frequency % 10 == 1)
 					Frequency -= 1; // eg: 126.97501 -> 126.97500
 				if (Frequency % 10 == 9)
