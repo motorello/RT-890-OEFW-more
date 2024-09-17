@@ -442,7 +442,7 @@ void Task_CheckKeyPad(void)
 			if (KEY_KeyCounter > 10 && gRadioMode == RADIO_MODE_TX && !gEnableLocalAlarm && !gDTMF_Playing) {
 				gDTMF_Playing = true;
 				DTMF_PlayTone(Key);
-			} else if (KEY_KeyCounter > 1000) {
+			} else if (KEY_KeyCounter > 500) { // I guess this is milliseconds. It was 1000, halving the time needed to keep the key pressed
 				KEY_LongPressed = true;
 				gLockTimer = 0;
 				HandlerLong(Key);
