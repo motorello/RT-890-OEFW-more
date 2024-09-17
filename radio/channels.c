@@ -21,6 +21,7 @@
 #include "driver/audio.h"
 #include "driver/key.h"
 #include "driver/serial-flash.h"
+#include "driver/pins.h"
 #include "helper/inputbox.h"
 #include "misc.h"
 #include "radio/channels.h"
@@ -406,6 +407,19 @@ void CHANNELS_NextChannelVfo(uint8_t Key)
 				pInfo->RX.Frequency = 1000000;
 			}
 		}
+
+#ifdef ENABLE_833_RETUNE
+		// try to properly handle the 8.33 kHz step: since the .33 is periodic, theoretically every 3 steps of .33 we should fall into 1.0
+		// this piece of code handles the scan mode. The manual mode is handled in 'radio/channels.c', line 561
+		// TODO: create a dedicated function for the two identical calls
+		if (FREQUENCY_GetStep(gSettings.FrequencyStep) == 833) {
+			if (pInfo->RX.Frequency % 10 == 1)
+				pInfo->RX.Frequency -= 1; // eg: 126.97501 -> 126.97500
+			if (pInfo->RX.Frequency % 10 == 9)
+				pInfo->RX.Frequency += 1; // eg: 127.02499 -> 127.02500
+		}
+#endif
+
 		pInfo->TX.Frequency = pInfo->RX.Frequency;
 		gVfoInfo[gSettings.CurrentVfo].Frequency = pInfo->RX.Frequency;
 		// if (pInfo->RX.Frequency < 13600000) {
@@ -540,6 +554,16 @@ void CHANNELS_UpdateVFO(void)
 					(Frequency >= 10800000 && Frequency <= 13600000)))
 			) {
 		if (!gFrequencyReverse) {
+#ifdef ENABLE_833_RETUNE
+			// try to properly handle the 8.33 kHz step: since the .33 is periodic, theoretically every 3 steps of .33 we should fall into 1.0
+			// this piece of code handles the manually input frequency. The scan mode is handled in 'radio/channels.c', line 407
+			if (FREQUENCY_GetStep(gSettings.FrequencyStep) == 833) {
+				if (Frequency % 10 == 1)
+					Frequency -= 1; // eg: 126.97501 -> 126.97500
+				if (Frequency % 10 == 9)
+					Frequency += 1; // eg: 127.02499 -> 127.02500
+			}
+#endif
 			gVfoState[gSettings.CurrentVfo].RX.Frequency = Frequency;
 #ifdef ENABLE_AUTO_SWITCH_AM
 			if (Frequency >= 10800000 && Frequency <= 13600000) {
