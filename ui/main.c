@@ -18,7 +18,6 @@
 #include "driver/battery.h"
 #include "helper/dtmf.h"
 #include "helper/inputbox.h"
-#include "helper/helper.h"
 #include "misc.h"
 #include "radio/settings.h"
 #include "ui/gfx.h"
