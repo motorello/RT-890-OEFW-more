@@ -18,6 +18,7 @@
 #include "driver/battery.h"
 #include "helper/dtmf.h"
 #include "helper/inputbox.h"
+#include "helper/helper.h"
 #include "misc.h"
 #include "radio/settings.h"
 #include "ui/gfx.h"
@@ -28,7 +29,8 @@
 void DrawStatusBar(void)
 {
 	DISPLAY_Fill(0, 159, 0, 96, COLOR_BACKGROUND);
-	DISPLAY_DrawRectangle0(0, 82, 160, 1, gSettings.BorderColor);
+	//DISPLAY_DrawRectangle0(0, 82, 160, 1, gSettings.BorderColor);
+	DISPLAY_DrawRectangle0(0, 82, 160, 1, COLOR_GREY);
 	
 	if (gSettings.DtmfState == DTMF_STATE_STUNNED) {
 		UI_DrawStatusIcon(2, ICON_LOCK, true, COLOR_RED);
@@ -57,7 +59,13 @@ void DrawStatusBar(void)
 		"5.00M"
 	};
 	gColorForeground = COLOR_GREY;
-	UI_DrawSmallString(14, 86, StepStrings[gSettings.FrequencyStep], 5);//Step Index
+	UI_DrawSmallString(14, 86, StepStrings[gSettings.FrequencyStep], 5);
+
+	// squelch is common to all VFOs
+	UI_DrawSmallCharacter(48 + 5 + 1, 86, 'S');
+	UI_DrawSmallCharacter(48 + 5 + 1 + 5 + 2, 86, '0' + gSettings.Squelch);
+	//Int2Ascii(gSettings.Squelch, 2);
+	//UI_DrawSmallString(14 + 25 + 2 + 5 + 1, 86, gShortString, 2);
 
 	if (gSettings.DualStandby == true) {
 		gColorForeground = COLOR_GREY;
