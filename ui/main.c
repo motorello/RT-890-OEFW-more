@@ -36,6 +36,29 @@ void DrawStatusBar(void)
 		UI_DrawStatusIcon(2, ICON_LOCK, gSettings.Lock, COLOR_GREY);
 	}
 
+	// frequency step is common to all VFOs
+	#define SPECTRUM_STEPS_COUNT 16
+	static const char StepStrings[SPECTRUM_STEPS_COUNT][5] = {
+		"0.01K",
+		"0.25K",
+		"1.25K",
+		"2.50K",
+		"5.00K",
+		"6.25K",
+		"8.33K",
+		"10.0K",
+		"12.5K",
+		"20.0K",
+		"25.0K",
+		"50.0K",
+		"100.K",
+		"500.K",
+		"1.00M",
+		"5.00M"
+	};
+	gColorForeground = COLOR_GREY;
+	UI_DrawSmallString(14, 86, StepStrings[gSettings.FrequencyStep], 5);//Step Index
+
 	if (gSettings.DualStandby == true) {
 		gColorForeground = COLOR_GREY;
 		UI_DrawSmallString(112, 86, "D", 1); 
