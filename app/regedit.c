@@ -105,7 +105,7 @@ void APP_RegEdit(void) {
 
     uint16_t ActiveGainReg;
 
-	RADIO_EndAudio();  // Just in case audio is open
+	//RADIO_EndAudio();  // Just in case audio is open
 
 	DISPLAY_Fill(0, 159, 1, 96, COLOR_BACKGROUND);
 
