@@ -354,8 +354,8 @@ void UI_DrawVoltage(uint8_t Vfo)
 		UI_DrawSmallString(88, Y-12, gShortString, 1);
 		// Extract bits 9:8
 		Int2Ascii((regValue & 0x300) >> 8, 1);
-		UI_DrawSmallString(16, Y-12, "LNAS", 4);
-		UI_DrawSmallString(40, Y-12, gShortString, 1);
+		UI_DrawSmallString(16, Y-12, "LNAS ", 5);
+		UI_DrawSmallString(40+5, Y-12, gShortString, 1);
 		// Next, logic to handle REG_43<14:12> (RF filter bandwidth)
 		regValue = BK4819_ReadRegister(0x43);
 		// Extract bits 14:12
