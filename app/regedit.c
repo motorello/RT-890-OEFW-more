@@ -177,10 +177,12 @@ void RegEditCheckKeys(void) {
 				bExit = true;
 				break;
 			case KEY_UP:
-				RegIndex = (RegIndex + 1) % RegCount;
+				//RegIndex = (RegIndex + 1) % RegCount;
+				RegIndex = (RegIndex + RegCount - 1) % RegCount;
 				break;
 			case KEY_DOWN:
-				RegIndex = (RegIndex + RegCount - 1) % RegCount;
+				RegIndex = (RegIndex + 1) % RegCount;
+				//RegIndex = (RegIndex + RegCount - 1) % RegCount;
 				break;
             case KEY_1:
                 BK4819_ToggleAGCMode();
