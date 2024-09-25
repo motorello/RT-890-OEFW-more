@@ -19,6 +19,8 @@
 #include "driver/bk4819.h"
 #include "driver/key.h"
 #include "helper/helper.h"
+#include "radio/settings.h"
+#include "task/vox.h"
 #include "ui/gfx.h"
 #include "ui/helper.h"
 #include "ui/main.h"
@@ -46,6 +48,101 @@ static uint8_t RegIndex = 1;
 static uint16_t RegValue;
 static uint16_t SettingValue;
 static uint8_t CurrentReg; 
+
+void UI_DrawStatusRegedit(uint8_t Vfo, uint32_t Frequency) {
+
+	// write current vfo
+	UI_DrawSmallString(2, 86, "VFO", 3);
+	UI_DrawSmallCharacter(2 + 4*5, 86, '0' + Vfo+1);
+	//UI_DrawSmallCharacter(2 + 5*5 , 86, '-');
+	
+	// write current frequency
+	Int2Ascii(Frequency, 8);
+	for(uint8_t i = 7; i > 2; i--) {
+		gShortString[i+1] = gShortString[i];
+	}
+	gShortString[3] = '.';	
+	UI_DrawSmallString(160 - 9*6, 86, gShortString, 9);
+}
+
+void UI_DrawBarRegedit(uint8_t Level)
+{
+	uint8_t Y = 10;
+	uint8_t i;
+
+    if (Level < 33) {
+		gColorForeground = COLOR_RGB(31, 62,  0);
+	} else if (Level < 66) {
+		gColorForeground = COLOR_RGB(31, 41,  0);
+	} else {
+		gColorForeground = COLOR_RGB(31, 29,  0);
+	}
+
+	for (i = 0; i < Level; i++) {
+	if (i != 0 && i != 33 && i != 66 && i != 99) {
+			DISPLAY_DrawRectangle1(15 + i, Y, 4, 1, gColorForeground);
+		}
+	}
+
+    for (; Level < 100; Level++) {
+		if (Level != 0 && Level != 33 && Level != 66 && Level != 99) {
+			DISPLAY_DrawRectangle1(15 + Level, Y, 4, 1, gColorBackground);
+		}
+	}
+}
+
+void UI_DrawRxDBMRegedit(bool Clear)
+{
+	uint8_t Y = 10;
+		
+	gColorForeground = COLOR_FOREGROUND;
+	if (Clear) {
+		UI_DrawSmallString(120, Y, "     ", 5);
+	} else {
+		UI_DrawSmallString(120, Y, gShortString, 4);
+	}
+}
+
+static void CheckRSSIRegedit(void)
+{
+	if (gVoxRssiUpdateTimer != 0) {
+		return;
+	}
+
+#ifdef ENABLE_SLOWER_RSSI_TIMER
+		gVoxRssiUpdateTimer = 500;
+#else
+		gVoxRssiUpdateTimer = 100;
+#endif
+
+	uint16_t RSSI;
+	uint16_t Power;
+
+	RSSI = BK4819_GetRSSI();
+
+	//Valid range is 72 - 330
+	if (RSSI < 72) {
+		Power = 0;
+	} else if (RSSI > 330) {
+		Power = 100;
+	} else {
+		Power = ((RSSI-72)*100)/258;
+	}
+	
+	UI_DrawBarRegedit(Power);
+	ConvertRssiToDbm(RSSI);
+	UI_DrawRxDBMRegedit(false);
+}
+
+
+void RegeditDrawStatusBar(uint8_t Vfo)
+{
+	DISPLAY_Fill(0, 159, 0, 96, COLOR_BACKGROUND);
+	//DISPLAY_DrawRectangle0(0, 82, 160, 1, gSettings.BorderColor);
+	DISPLAY_DrawRectangle0(0, 82, 160, 1, COLOR_GREY);
+
+	UI_DrawStatusRegedit(Vfo, gVfoInfo[Vfo].Frequency);
+}
 
 void ChangeRegValue(uint8_t bUp) {
 
@@ -109,6 +206,8 @@ void APP_RegEdit(void) {
 
 	DISPLAY_Fill(0, 159, 1, 96, COLOR_BACKGROUND);
 
+	RegeditDrawStatusBar(gCurrentVfo);
+
     bExit = false;
 	gScreenMode = SCREEN_REGEDIT;
 
@@ -135,10 +234,17 @@ void APP_RegEdit(void) {
         SettingValue &= RegisterTable[RegIndex].Mask;
 
         gColorForeground = COLOR_FOREGROUND;
-        UI_DrawString(50, 30, RegisterTable[RegIndex].Name, 5);
+        UI_DrawString(50, 40, RegisterTable[RegIndex].Name, 5);
         gShortString[1] = ' ';
         Int2Ascii(SettingValue, RegisterTable[RegIndex].DiplayDigits);
-        UI_DrawString(100, 30, gShortString, 2);
+        UI_DrawString(100, 40, gShortString, 2);
+
+        if(gSettings.Squelch == 0) {
+        	// for the moment, only display the s-meter if squelch is open, otherwise squelch does not open upon receiving
+        	CheckRSSIRegedit();
+        } else {
+        	UI_DrawSmallString((160 - 14*6)/2, 10, "SQUELCH CLOSED", 14);
+        }
 
         DELAY_WaitMS(100);
 	}
