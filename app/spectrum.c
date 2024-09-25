@@ -85,8 +85,8 @@ static const char StepStrings[SPECTRUM_STEPS_COUNT][5] = {
 	"20.0K",
 	"25.0K",
 	"50.0K",
-	" 100K",
-	" 500K",
+	"100.K",
+	"500.K",
 	"1.00M",
 	"5.00M"
 };
