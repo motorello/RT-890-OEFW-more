@@ -23,6 +23,7 @@
 #ifdef ENABLE_AM_FIX
 	extern int16_t rssi_gain_diff[2];
     extern uint16_t gAmFixCountdown;
+    extern uint8_t gAmFixIndex;
 
 	void AM_fix_init(void);
 	void AM_fix_reset(const int vfo);

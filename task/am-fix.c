@@ -25,7 +25,12 @@
 #include "radio/settings.h"
 #include "misc.h"
 
+//#include "driver/pins.h" // for testing only -> gpio_set
+
 #ifdef ENABLE_AM_FIX
+
+uint8_t gAmFixIndex;
+uint16_t gAmFixCountdown;
 
 typedef struct
 {
@@ -81,7 +86,7 @@ typedef struct
 //           if I don't add the brackets, reading the table returns unexpected/different values !!!
 //
 //
-////	static const int16_t lna_short_dB[] = {  -19,   -16,   -11,     0};   // was (but wrong)
+//	static const int16_t lna_short_dB[] = {  -19,   -16,   -11,     0};   // was (but wrong)
 //	static const int16_t lna_short_dB[] = { (-33), (-30), (-24),    0};   // corrected'ish
 //	static const int16_t lna_dB[]       = { (-24), (-19), (-14), ( -9), (-6), (-4), (-2), 0};
 //	static const int16_t mixer_dB[]     = { ( -8), ( -6), ( -3),    0};
@@ -89,6 +94,7 @@ typedef struct
 
 // lookup table is hugely easier than writing code to do the same
 //
+#if 0
 static const t_gain_table gain_table[] =
 {
 	{0x03BE, -7},          //        3 5 3 6 ..   0dB   -4dB 0dB  -3dB ..  -7dB original
@@ -190,8 +196,111 @@ static const t_gain_table gain_table[] =
 	{0x03FF,   0},         //  96 .. 3 7 3 7 ..   0dB   0dB  0dB   0dB ..   0dB
 };
 
-static const unsigned int original_index = 90;
-uint16_t gAmFixCountdown;
+static const t_gain_table gain_table[] =
+{
+	{0x03BE, -7},          //  0        3 5 3 6 ..   0dB  -4dB  0dB  -3dB ..  -7dB original
+
+	{ (3<<8)|(2<<5)|(0<<3)|(0<<0), -55 },
+	{ (3<<8)|(3<<5)|(0<<3)|(0<<0), -50 },
+	{ (3<<8)|(3<<5)|(1<<3)|(0<<0), -48 },
+	{ (3<<8)|(3<<5)|(2<<3)|(0<<0), -45 },
+
+	{0x0379, -36},         //  1  61 .. 3 3 3 1 ..   0dB  -9dB  0dB -27dB .. -36dB
+	{0x035A, -35},         //  2  62 .. 3 2 3 2 ..   0dB -14dB  0dB -21dB .. -35dB
+	{0x030E, -33},         //  3  64 .. 3 0 1 6 ..   0dB -24dB -6dB  -3dB .. -33dB
+	{0x0307, -32},         //  4  65 .. 3 0 0 7 ..   0dB -24dB -8dB   0dB .. -32dB
+	{0x037A, -30},         //  5  67 .. 3 3 3 2 ..   0dB  -9dB  0dB -21dB .. -30dB
+	{0x0345, -28},         //  6  69 .. 3 2 0 5 ..   0dB -14dB -8dB  -6dB .. -28dB
+	{0x03A3, -27},         //  7  70 .. 3 5 0 3 ..   0dB  -4dB -8dB -15dB .. -27dB
+	{0x0364, -26},         //  8  71 .. 3 3 0 4 ..   0dB  -9dB -8dB  -9dB .. -26dB
+	{0x032F, -25},         //  9  72 .. 3 1 1 7 ..   0dB -19dB -6dB   0dB .. -25dB
+	{0x0393, -24},         // 10  73 .. 3 4 2 3 ..   0dB  -6dB -3dB -15dB .. -24dB
+	{0x0384, -23},         // 11  74 .. 3 4 0 4 ..   0dB  -6dB -8dB  -9dB .. -23dB
+	{0x0347, -22},         // 12  75 .. 3 2 0 7 ..   0dB -14dB -8dB   0dB .. -22dB
+	{0x03EB, -21},         // 13  76 .. 3 7 1 3 ..   0dB   0dB -6dB -15dB .. -21dB
+	{0x03D3, -20},         // 14  77 .. 3 6 2 3 ..   0dB  -2dB -3dB -15dB .. -20dB
+	{0x03BB, -19},         // 15  78 .. 3 5 3 3 ..   0dB  -4dB  0dB -15dB .. -19dB
+	{0x037C, -18},         // 16  79 .. 3 3 3 4 ..   0dB  -9dB  0dB  -9dB .. -18dB
+	{0x03CC, -17},         // 17  80 .. 3 6 1 4 ..   0dB  -2dB -6dB  -9dB .. -17dB
+	{0x03C5, -16},         // 18  81 .. 3 6 0 5 ..   0dB  -2dB -8dB  -6dB .. -16dB
+	{0x03EC, -15},         // 19  82 .. 3 7 1 4 ..   0dB   0dB -6dB  -9dB .. -15dB
+	{0x035F, -14},         // 20  83 .. 3 2 3 7 ..   0dB -14dB  0dB   0dB .. -14dB
+	{0x03BC, -13},         // 21  84 .. 3 5 3 4 ..   0dB  -4dB  0dB  -9dB .. -13dB
+	{0x038F, -12},         // 22  85 .. 3 4 1 7 ..   0dB  -6dB -6dB   0dB .. -12dB
+	{0x03E6, -11},         // 23  86 .. 3 7 0 6 ..   0dB   0dB -8dB  -3dB .. -11dB
+	{0x03AF, -10},         // 24  87 .. 3 5 1 7 ..   0dB  -4dB -6dB   0dB .. -10dB
+	{0x03F5,  -9},         // 25  88 .. 3 7 2 5 ..   0dB   0dB -3dB  -6dB ..  -9dB
+	{0x03D6,  -8},         // 26  89 .. 3 6 2 6 ..   0dB  -2dB -3dB  -3dB ..  -8dB
+	{0x03BE,  -7},         // 27  90 .. 3 5 3 6 ..   0dB  -4dB  0dB  -3dB ..  -7dB original
+	{0x03F6,  -6},         // 28  91 .. 3 7 2 6 ..   0dB   0dB -3dB  -3dB ..  -6dB
+	{0x03DE,  -5},         // 29  92 .. 3 6 3 6 ..   0dB  -2dB  0dB  -3dB ..  -5dB
+	{0x03BF,  -4},         // 30  93 .. 3 5 3 7 ..   0dB  -4dB  0dB   0dB ..  -4dB
+	{0x03F7,  -3},         // 31  94 .. 3 7 2 7 ..   0dB   0dB -3dB   0dB ..  -3dB
+	{0x03DF,  -2},         // 32  95 .. 3 6 3 7 ..   0dB  -2dB  0dB   0dB ..  -2dB
+	{0x03FF,   0},         // 33  96 .. 3 7 3 7 ..   0dB   0dB  0dB   0dB ..   0dB
+};
+#endif
+
+static const t_gain_table gain_table[] =
+{
+	{0x03BE, -7},          //        3 5 3 6 ..   0dB   -4dB 0dB  -3dB ..  -7dB original
+	{0x0100, -95},         //   3 .. 1 0 0 0 .. -30dB -24dB -8dB -33dB .. -95dB
+	{0x0101, -89},         //   8 .. 1 0 0 1 .. -30dB -24dB -8dB -27dB .. -89dB
+	{0x0118, -87},         //  10 .. 1 0 3 0 .. -30dB -24dB  0dB -33dB .. -87dB
+	{0x0130, -85},         //  12 .. 1 1 2 0 .. -30dB -19dB -3dB -33dB .. -85dB
+	{0x0138, -82},         //  15 .. 1 1 3 0 .. -30dB -19dB  0dB -33dB .. -82dB
+	{0x0119, -81},         //  16 .. 1 0 3 1 .. -30dB -24dB  0dB -27dB .. -81dB
+	{0x0141, -79},         //  18 .. 1 2 0 1 .. -30dB -14dB -8dB -27dB .. -79dB
+	{0x0180, -77},         //  20 .. 1 4 0 0 .. -30dB  -6dB -8dB -33dB .. -77dB
+	{0x0139, -76},         //  21 .. 1 1 3 1 .. -30dB -19dB  0dB -27dB .. -76dB
+	{0x0161, -74},         //  23 .. 1 3 0 1 .. -30dB  -9dB -8dB -27dB .. -74dB
+	{0x01C0, -73},         //  24 .. 1 6 0 0 .. -30dB  -2dB -8dB -33dB .. -73dB
+	{0x015A, -65},         //  32 .. 1 2 3 2 .. -30dB -14dB  0dB -21dB .. -65dB
+	{0x01F8, -63},         //  34 .. 1 7 3 0 .. -30dB   0dB  0dB -33dB .. -63dB
+	{0x0163, -62},         //  35 .. 1 3 0 3 .. -30dB  -9dB -8dB -15dB .. -62dB
+	{0x01D9, -59},         //  38 .. 1 6 3 1 .. -30dB  -2dB  0dB -27dB .. -59dB
+	{0x0145, -58},         //  39 .. 1 2 0 5 .. -30dB -14dB -8dB  -6dB .. -58dB
+	{0x015D, -50},         //  47 .. 1 2 3 5 .. -30dB -14dB  0dB  -6dB .. -50dB
+	{0x01B4, -46},         //  51 .. 1 5 2 4 .. -30dB  -4dB -3dB  -9dB .. -46dB
+	{0x030B, -45},         //  52 .. 3 0 1 3 ..   0dB -24dB -6dB -15dB .. -45dB
+	{0x01B5, -43},         //  54 .. 1 5 2 5 .. -30dB  -4dB -3dB  -6dB .. -43dB
+	{0x01DD, -38},         //  59 .. 1 6 3 5 .. -30dB  -2dB  0dB  -6dB .. -38dB
+	{0x0379, -36},         //  61 .. 3 3 3 1 ..   0dB  -9dB  0dB -27dB .. -36dB
+	{0x035A, -35},         //  62 .. 3 2 3 2 ..   0dB -14dB  0dB -21dB .. -35dB
+	{0x030E, -33},         //  64 .. 3 0 1 6 ..   0dB -24dB -6dB  -3dB .. -33dB
+	{0x0307, -32},         //  65 .. 3 0 0 7 ..   0dB -24dB -8dB   0dB .. -32dB
+	{0x037A, -30},         //  67 .. 3 3 3 2 ..   0dB  -9dB  0dB -21dB .. -30dB
+	{0x0345, -28},         //  69 .. 3 2 0 5 ..   0dB -14dB -8dB  -6dB .. -28dB
+	{0x03A3, -27},         //  70 .. 3 5 0 3 ..   0dB  -4dB -8dB -15dB .. -27dB
+	{0x0364, -26},         //  71 .. 3 3 0 4 ..   0dB  -9dB -8dB  -9dB .. -26dB
+	{0x032F, -25},         //  72 .. 3 1 1 7 ..   0dB -19dB -6dB   0dB .. -25dB
+	{0x0393, -24},         //  73 .. 3 4 2 3 ..   0dB  -6dB -3dB -15dB .. -24dB
+	{0x0384, -23},         //  74 .. 3 4 0 4 ..   0dB  -6dB -8dB  -9dB .. -23dB
+	{0x0347, -22},         //  75 .. 3 2 0 7 ..   0dB -14dB -8dB   0dB .. -22dB
+	{0x03EB, -21},         //  76 .. 3 7 1 3 ..   0dB   0dB -6dB -15dB .. -21dB
+	{0x03D3, -20},         //  77 .. 3 6 2 3 ..   0dB  -2dB -3dB -15dB .. -20dB
+	{0x03BB, -19},         //  78 .. 3 5 3 3 ..   0dB  -4dB  0dB -15dB .. -19dB
+	{0x037C, -18},         //  79 .. 3 3 3 4 ..   0dB  -9dB  0dB  -9dB .. -18dB
+	{0x03CC, -17},         //  80 .. 3 6 1 4 ..   0dB  -2dB -6dB  -9dB .. -17dB
+	{0x03C5, -16},         //  81 .. 3 6 0 5 ..   0dB  -2dB -8dB  -6dB .. -16dB
+	{0x03EC, -15},         //  82 .. 3 7 1 4 ..   0dB   0dB -6dB  -9dB .. -15dB
+	{0x035F, -14},         //  83 .. 3 2 3 7 ..   0dB -14dB  0dB   0dB .. -14dB
+	{0x03BC, -13},         //  84 .. 3 5 3 4 ..   0dB  -4dB  0dB  -9dB .. -13dB
+	{0x038F, -12},         //  85 .. 3 4 1 7 ..   0dB  -6dB -6dB   0dB .. -12dB
+	{0x03E6, -11},         //  86 .. 3 7 0 6 ..   0dB   0dB -8dB  -3dB .. -11dB
+	{0x03AF, -10},         //  87 .. 3 5 1 7 ..   0dB  -4dB -6dB   0dB .. -10dB
+	{0x03F5,  -9},         //  88 .. 3 7 2 5 ..   0dB   0dB -3dB  -6dB ..  -9dB
+	{0x03D6,  -8},         //  89 .. 3 6 2 6 ..   0dB  -2dB -3dB  -3dB ..  -8dB
+	{0x03BE,  -7},         //  90 .. 3 5 3 6 ..   0dB  -4dB  0dB  -3dB ..  -7dB original
+	{0x03F6,  -6},         //  91 .. 3 7 2 6 ..   0dB   0dB -3dB  -3dB ..  -6dB
+	{0x03DE,  -5},         //  92 .. 3 6 3 6 ..   0dB  -2dB  0dB  -3dB ..  -5dB
+	{0x03BF,  -4},         //  93 .. 3 5 3 7 ..   0dB  -4dB  0dB   0dB ..  -4dB
+	{0x03F7,  -3},         //  94 .. 3 7 2 7 ..   0dB   0dB -3dB   0dB ..  -3dB
+	{0x03DF,  -2},         //  95 .. 3 6 3 7 ..   0dB  -2dB  0dB   0dB ..  -2dB
+	{0x03FF,   0},         //  96 .. 3 7 3 7 ..   0dB   0dB  0dB   0dB ..   0dB
+};
+static const uint8_t standby_gain_index = ARRAY_SIZE(gain_table) - 2;
+static const unsigned int original_index = ARRAY_SIZE(gain_table) - 6;
 
 unsigned int gain_table_index[2] = {original_index, original_index};
 
@@ -212,7 +321,8 @@ unsigned int max_index = ARRAY_SIZE(gain_table) - 1;
 
 #ifndef ENABLE_AM_FIX_TEST1
 	// -89 dBm, any higher and the AM demodulator starts to saturate/clip/distort
-	const int16_t desired_rssi = (-83 + 160) * 2;
+	//const int16_t desired_rssi = (-83 + 160) * 2;
+	const int16_t desired_rssi = (-81 + 160) * 2;
 #endif
 
 void AM_fix_init(void)
@@ -263,12 +373,13 @@ void Task_AM_fix()
 		const int vfo = gCurrentVfo;
 
 		switch (gRadioMode) {
-				case RADIO_MODE_QUIET:
+				//case RADIO_MODE_QUIET:
 				case RADIO_MODE_TX:
 				gAmFixCountdown = 50; // 100
 				return;
 
 			// only adjust stuff if we're in one of these modes
+			case RADIO_MODE_QUIET:
 			case RADIO_MODE_INCOMING:
 			case RADIO_MODE_RX:
 				break;
@@ -293,64 +404,68 @@ void Task_AM_fix()
 
 		if (diff_dB > 0) {
 			// decrease gain
+			//gpio_bits_set(GPIOA, BOARD_GPIOA_LED_RED);
 
-			unsigned int index = gain_table_index[vfo];   // current position we're at
+			gAmFixIndex = gain_table_index[vfo];   // current position we're at
+			//unsigned int index = gain_table_index[vfo];   // current position we're at
 
-			if (diff_dB >= 10) {
+			if (diff_dB >= 6) {
 				// jump immediately to a new gain setting
 				// this greatly speeds up initial gain reduction (but reduces noise/spike immunity)
 
-				const int16_t desired_gain_dB = (int16_t)gain_table[index].gain_dB - diff_dB + 8; // get no closer than 8dB (bit of noise/spike immunity)
+				const int16_t desired_gain_dB = (int16_t)gain_table[gAmFixIndex].gain_dB - diff_dB + 6; //8; // get no closer than 8dB (bit of noise/spike immunity)
 
 				// scan the table to see what index to jump straight too
-				while (index > 1)
-					if (gain_table[--index].gain_dB <= desired_gain_dB)
+				while (gAmFixIndex > 1)
+					if (gain_table[--gAmFixIndex].gain_dB <= desired_gain_dB)
 						break;
 
-				//index = (gain_table_index[vfo] + index) / 2;  // easy does it
+				//gAmFixIndex = (gain_table_index[vfo] + gAmFixIndex) / 2;  // easy does it
 			} else {	// incrementally reduce the gain .. taking it slow improves noise/spike immunity
 
-//				if (index >= (1 + 3) && diff_dB >= 3)
-//					index -= 3;  // faster gain reduction
-//				else
-				if (index > 1) {
-					index--;     // slow step-by-step gain reduction
+				if (gAmFixIndex >= (1 + 3) && diff_dB >= 3)
+					gAmFixIndex -= 3;  // faster gain reduction
+				else
+				if (gAmFixIndex > 1) {
+					gAmFixIndex--;     // slow step-by-step gain reduction
 				}
 			}
 
-			index = (index < 1) ? 1 : (index > (ARRAY_SIZE(gain_table) - 1)) ? ARRAY_SIZE(gain_table) - 1 : index;
+			gAmFixIndex = (gAmFixIndex < 1) ? 1 : (gAmFixIndex > (ARRAY_SIZE(gain_table) - 1)) ? ARRAY_SIZE(gain_table) - 1 : gAmFixIndex;
 
-			if (gain_table_index[vfo] != index) {
-				gain_table_index[vfo] = index;
-				hold_counter[vfo] = 100;       // 300ms hold
+			if (gain_table_index[vfo] != gAmFixIndex) {
+				gain_table_index[vfo] = gAmFixIndex;
+				hold_counter[vfo] = 30;       // 300ms hold
 			}
 		}
 
-		if (diff_dB >= -6) {                   // 6dB hysterisis (help reduce gain hunting)
-			hold_counter[vfo] = 100;           // 300ms hold
+		if (diff_dB >= -3) {                   // 6dB hysterisis (help reduce gain hunting)
+			hold_counter[vfo] = 30;           // 300ms hold
 		}
 
 		if (hold_counter[vfo] == 0) {
 			// hold has been released, we're free to increase gain
-			const unsigned int index = gain_table_index[vfo] + 1;                 // move up to next gain index
-			gain_table_index[vfo] = (index < ARRAY_SIZE(gain_table)) ? index : ARRAY_SIZE(gain_table) - 1;     // limit the gain index
+			//gpio_bits_reset(GPIOA, BOARD_GPIOA_LED_RED);
+			gAmFixIndex = gain_table_index[vfo] + 1;                 // move up to next gain index
+			//gain_table_index[vfo] = (index < ARRAY_SIZE(gain_table)) ? index : ARRAY_SIZE(gain_table) - 1;     // limit the gain index
+			gain_table_index[vfo] = (gAmFixIndex < standby_gain_index) ? gAmFixIndex : standby_gain_index;     // limit the gain index to 90 (original QS)
 		}
 
 		{	// apply the new settings to the front end registers
-			const unsigned int index = gain_table_index[vfo];
+			gAmFixIndex = gain_table_index[vfo];
 
 			// remember the new table index
-			gain_table_index_prev[vfo] = index;
+			gain_table_index_prev[vfo] = gAmFixIndex;
 
-			BK4819_WriteRegister(0x13, gain_table[index].reg_val);
+			BK4819_WriteRegister(0x13, gain_table[gAmFixIndex].reg_val);
 
 			// offset the RSSI reading to the rest of the firmware to cancel out the gain adjustments we make
 
 			// RF gain difference from original QS setting
-			rssi_gain_diff[vfo] = ((int16_t)gain_table[index].gain_dB - gain_table[original_index].gain_dB) * 2;
+			rssi_gain_diff[vfo] = ((int16_t)gain_table[gAmFixIndex].gain_dB - gain_table[original_index].gain_dB) * 2;
 		}
 
-		gAmFixCountdown = 50;
+		gAmFixCountdown = 30;
 	} else {
 		gAmFixCountdown = 200;
 		BK4819_RestoreGainSettings();
