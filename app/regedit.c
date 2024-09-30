@@ -241,7 +241,7 @@ void APP_RegEdit(void) {
         Int2Ascii(SettingValue, RegisterTable[RegIndex].DiplayDigits);
         UI_DrawString(100, 40, gShortString, 2);
 
-        if(gSettings.Squelch == 0) {
+        if (gRadioMode == RADIO_MODE_RX) {
         	// for the moment, only display the s-meter if squelch is open, otherwise squelch does not open upon receiving
         	CheckRSSIRegedit();
         } else {
