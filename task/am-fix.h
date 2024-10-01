@@ -24,6 +24,7 @@
 	extern int16_t rssi_gain_diff[2];
     extern uint16_t gAmFixCountdown;
     extern uint8_t gAmFixIndex;
+    extern int8_t gAmFixTargetDbm;
 
 	void AM_fix_init(void);
 	void AM_fix_reset(const int vfo);

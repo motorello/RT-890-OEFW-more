@@ -29,8 +29,11 @@
 
 #ifdef ENABLE_AM_FIX
 
+#define TARGET_DBM (-80)
+
 uint8_t gAmFixIndex;
 uint16_t gAmFixCountdown;
+int8_t gAmFixTargetDbm = TARGET_DBM;
 
 typedef struct
 {
@@ -240,9 +243,8 @@ static const t_gain_table gain_table[] =
 	{ (3 << 8)|(7 << 5)|(3 << 3)|(7 << 0),   0 },  // index: 38, LNAS 0dBm, LNA   0dBm, MIX  0dBm, PGA   0dBm -->   0dBm total
 };
 
-static const uint8_t standby_gain_index = ARRAY_SIZE(gain_table) - 2;
-static const unsigned int original_index = ARRAY_SIZE(gain_table) - 6;
-#define TARGET_DBM (-85)
+static const uint8_t standby_gain_index = ARRAY_SIZE(gain_table) - 5;
+static const unsigned int original_index = ARRAY_SIZE(gain_table) - 7;
 
 unsigned int gain_table_index[2] = {original_index, original_index};
 
