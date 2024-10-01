@@ -310,6 +310,8 @@ void UI_DrawRoger(void)
 
 void UI_DrawVoltage(uint8_t Vfo)
 {
+	static bool bVoltageDisplay = true;
+
 	if ((gSettings.DualDisplay == 0 && gScreenMode == SCREEN_MAIN)
 #ifdef ENABLE_REGISTER_EDIT
 		|| (gScreenMode == SCREEN_REGEDIT)
@@ -369,10 +371,14 @@ void UI_DrawVoltage(uint8_t Vfo)
 		UI_DrawSmallString(82, Y-24, "WK", 2);
 		UI_DrawSmallString(94, Y-24, gShortString, 1);
 
-		if (gVfoState[gSettings.CurrentVfo].gModulationType == 1 && gExtendedSettings.AmFixEnabled) {
+		if (gVfoState[!Vfo].gModulationType == 1 && gExtendedSettings.AmFixEnabled) {
 			// if we are receiving AM with fix, then we write the am-fix index instead of battery
 			gColorForeground = COLOR_RGB(31, 31, 0); // YELLOW
 			Int2Ascii(gAmFixIndex, 2);
+			if (bVoltageDisplay) {
+				UI_DrawSmallString(112, Y-24, "     ", 5); // blank the previously displayed voltage
+				bVoltageDisplay = false;
+			}
 			UI_DrawSmallString(120, Y-24, gShortString, 2);
 		} else {
 			// write battery voltage
@@ -383,6 +389,7 @@ void UI_DrawVoltage(uint8_t Vfo)
 			gShortString[1] = '.';
 			gShortString[3] = 'V';
 			UI_DrawSmallString(118, Y-24, gShortString, 4);
+			bVoltageDisplay = true;
 		}
 		
 		regValue = BK4819_ReadRegister(0x48);
