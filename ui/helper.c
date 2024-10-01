@@ -319,8 +319,21 @@ void UI_DrawVoltage(uint8_t Vfo)
 	) {
 		const uint8_t Y = 70 - (Vfo * 41);
 		gColorForeground = COLOR_RGB( 0, 24, 31);
+		
+		if (gVfoState[!Vfo].gModulationType == 1 && gExtendedSettings.AmFixEnabled) {
+			if (bVoltageDisplay) {
+				UI_DrawSmallString(16, Y, "               ", 15);
+			}
+			UI_DrawSmallString(16, Y, "TARGET DBM ", 11);
+			Int2Ascii(gAmFixTargetDbm * -1, 2);
+			gShortString[2] = gShortString[1];
+			gShortString[1] = gShortString[0];
+			gShortString[0] = '-';
+			UI_DrawSmallString(16 + 11*6, Y, gShortString, 3);
+		} else {
+			UI_DrawSmallString(16, Y, "RF GAIN CONTROL", 15);
+		}
 
-		UI_DrawSmallString(16, Y, "RF GAIN CONTROL", 15);
 		/* Replacing voltage display with register display */
 		uint16_t regValue = BK4819_ReadRegister(0x7E);
 		// Extract bits 15, 14, 13 and 12
