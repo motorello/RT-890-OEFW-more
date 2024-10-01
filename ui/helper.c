@@ -310,7 +310,9 @@ void UI_DrawRoger(void)
 
 void UI_DrawVoltage(uint8_t Vfo)
 {
+#ifdef ENABLE_AM_FIX_INDEX_DISPLAY
 	static bool bVoltageDisplay = true;
+#endif
 
 	if ((gSettings.DualDisplay == 0 && gScreenMode == SCREEN_MAIN)
 #ifdef ENABLE_REGISTER_EDIT
@@ -371,9 +373,10 @@ void UI_DrawVoltage(uint8_t Vfo)
 		UI_DrawSmallString(82, Y-24, "WK", 2);
 		UI_DrawSmallString(94, Y-24, gShortString, 1);
 
+#ifdef ENABLE_AM_FIX_INDEX_DISPLAY
 		if (gVfoState[!Vfo].gModulationType == 1 && gExtendedSettings.AmFixEnabled) {
 			// if we are receiving AM with fix, then we write the am-fix index instead of battery
-			gColorForeground = COLOR_RGB(31, 31, 0); // YELLOW
+			gColorForeground = COLOR_RGB(60, (63 - (2*(40 - gAmFixIndex))) > 0 ? (63 - (2*(40 - gAmFixIndex))) : 0, 0); // YELLOW to RED
 			Int2Ascii(gAmFixIndex, 2);
 			if (bVoltageDisplay) {
 				UI_DrawSmallString(112, Y-24, "     ", 5); // blank the previously displayed voltage
@@ -381,6 +384,7 @@ void UI_DrawVoltage(uint8_t Vfo)
 			}
 			UI_DrawSmallString(120, Y-24, gShortString, 2);
 		} else {
+#endif
 			// write battery voltage
 			gColorForeground = COLOR_GREY;
 			UI_DrawSmallString(112, Y-24, "0", 1);
@@ -389,9 +393,10 @@ void UI_DrawVoltage(uint8_t Vfo)
 			gShortString[1] = '.';
 			gShortString[3] = 'V';
 			UI_DrawSmallString(118, Y-24, gShortString, 4);
+#ifdef ENABLE_AM_FIX_INDEX_DISPLAY
 			bVoltageDisplay = true;
 		}
-		
+#endif
 		regValue = BK4819_ReadRegister(0x48);
 
 	}
