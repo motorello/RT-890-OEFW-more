@@ -394,7 +394,7 @@ void KeypressAction(uint8_t Action) {
                 UI_DrawMain(FALSE);
                 break;
 				
-				case ACTION_AGC_MODE:
+			case ACTION_AGC_MODE:
 				BK4819_ToggleAGCMode();
 				UI_DrawVoltage(!gCurrentVfo);
 				break;
