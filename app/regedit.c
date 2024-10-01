@@ -91,7 +91,7 @@ void UI_DrawBarRegedit(uint8_t Level)
 	}
 }
 
-void UI_DrawRxDBMRegedit(bool Clear)
+void UI_DrawRxDbmRegedit(bool Clear)
 {
 	uint8_t Y = 10;
 		
@@ -131,7 +131,7 @@ static void CheckRSSIRegedit(void)
 	
 	UI_DrawBarRegedit(Power);
 	ConvertRssiToDbm(RSSI);
-	UI_DrawRxDBMRegedit(false);
+	UI_DrawRxDbmRegedit(false);
 }
 
 
