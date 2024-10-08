@@ -61,10 +61,8 @@ void DrawStatusBar(void)
 	UI_DrawSmallString(14, 86, StepStrings[gSettings.FrequencyStep], 5);
 
 	// squelch is common to all VFOs
-	UI_DrawSmallCharacter(48 + 5 + 1, 86, 'S');
-	UI_DrawSmallCharacter(48 + 5 + 1 + 5 + 2, 86, '0' + gSettings.Squelch);
-	//Int2Ascii(gSettings.Squelch, 2);
-	//UI_DrawSmallString(14 + 25 + 2 + 5 + 1, 86, gShortString, 2);
+	//UI_DrawSmallCharacter(48 + 5 + 1, 86, 'S');
+	UI_DrawSmallCharacter(48 + 5 + 1, 86, '0' + gSettings.Squelch);
 
 	if (gSettings.DualStandby == true) {
 		gColorForeground = COLOR_GREY;
