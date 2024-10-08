@@ -398,7 +398,9 @@ void UI_DrawVoltage(uint8_t Vfo)
 				UI_DrawSmallString(112, Y-24, "     ", 5); // blank the previously displayed voltage
 				bVoltageDisplay = false;
 			}
-			UI_DrawSmallString(120, Y-24, gShortString, 2);
+			//UI_DrawSmallString(120, Y-24, gShortString, 2);
+			UI_DrawSmallString(108, Y-24, "IDX ", 4);
+			UI_DrawSmallString(108 + 4*6, Y-24, gShortString, 2);
 		} else {
 			// write battery voltage
 			gColorForeground = COLOR_GREY;
