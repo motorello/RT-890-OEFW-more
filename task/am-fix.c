@@ -29,11 +29,13 @@
 
 #ifdef ENABLE_AM_FIX
 
-#define TARGET_DBM (-80)
+#define CAP_DBM (-82)
+#define STANDBY_INDEX_RELATIVE_TO_MAX (-7)
 
 uint8_t gAmFixIndex;
 uint16_t gAmFixCountdown;
-int8_t gAmFixTargetDbm = TARGET_DBM;
+int8_t gAmFixCapDbm = CAP_DBM;
+uint8_t gAmFixStandbyIndex;
 
 typedef struct
 {
@@ -243,7 +245,7 @@ static const t_gain_table gain_table[] =
 	{ (3 << 8)|(7 << 5)|(3 << 3)|(7 << 0),   0 },  // index: 38, LNAS 0dBm, LNA   0dBm, MIX  0dBm, PGA   0dBm -->   0dBm total
 };
 
-static const uint8_t standby_gain_index = ARRAY_SIZE(gain_table) - 5;
+uint8_t gAmFixStandbyIndex = ARRAY_SIZE(gain_table) + STANDBY_INDEX_RELATIVE_TO_MAX;
 static const unsigned int original_index = ARRAY_SIZE(gain_table) - 7;
 
 unsigned int gain_table_index[2] = {original_index, original_index};
@@ -264,7 +266,7 @@ int16_t rssi_gain_diff[2] = {0, 0};
 unsigned int max_index = ARRAY_SIZE(gain_table) - 1;
 
 // -89 dBm, any higher and the AM demodulator starts to saturate/clip/distort
-const int16_t desired_rssi = (TARGET_DBM + 160) * 2;
+const int16_t desired_rssi = (CAP_DBM + 160) * 2;
 
 void AM_fix_init(void)
 {	// called at boot-up
@@ -387,7 +389,7 @@ void Task_AM_fix()
 			//gpio_bits_reset(GPIOA, BOARD_GPIOA_LED_RED);
 			gAmFixIndex = gain_table_index[vfo] + 1;                 // move up to next gain index
 			//gain_table_index[vfo] = (index < ARRAY_SIZE(gain_table)) ? index : ARRAY_SIZE(gain_table) - 1;     // limit the gain index
-			gain_table_index[vfo] = (gAmFixIndex < standby_gain_index) ? gAmFixIndex : standby_gain_index;     // limit the gain index to 90 (original QS)
+			gain_table_index[vfo] = (gAmFixIndex < gAmFixStandbyIndex) ? gAmFixIndex : gAmFixStandbyIndex;     // limit the gain index to 90 (original QS)
 		}
 
 		{	// apply the new settings to the front end registers

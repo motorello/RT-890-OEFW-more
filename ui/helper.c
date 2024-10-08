@@ -324,12 +324,17 @@ void UI_DrawVoltage(uint8_t Vfo)
 			if (bVoltageDisplay) {
 				UI_DrawSmallString(16, Y, "               ", 15);
 			}
-			UI_DrawSmallString(16, Y, "TARGET DBM ", 11);
-			Int2Ascii(gAmFixTargetDbm * -1, 2);
+			// print max dBm value accepted before reducing gain
+			UI_DrawSmallString(16, Y, "CAP ", 4);
+			Int2Ascii(gAmFixCapDbm * -1, 2);
 			gShortString[2] = gShortString[1];
 			gShortString[1] = gShortString[0];
 			gShortString[0] = '-';
-			UI_DrawSmallString(16 + 11*6, Y, gShortString, 3);
+			UI_DrawSmallString(16 + 4*6, Y, gShortString, 3);
+			// print the standby gain index
+			UI_DrawSmallString(16 + 4*6 + 4*6, Y, "STBY ", 5);
+			Int2Ascii(gAmFixStandbyIndex, 2);
+			UI_DrawSmallString(16 + 4*6 + 4*6 + 5*6, Y, gShortString, 2);
 		} else {
 			UI_DrawSmallString(16, Y, "RF GAIN CONTROL", 15);
 		}
@@ -338,7 +343,7 @@ void UI_DrawVoltage(uint8_t Vfo)
 		uint16_t regValue = BK4819_ReadRegister(0x7E);
 		// Extract bits 15, 14, 13 and 12
 		regValue = (regValue & 0xF000) >> 12;
-		// If bit 15 is set, display AUTO, otherwise display FIX
+		// If bit 15 is set, display AUTO, otherwise display FGC
 		if ((regValue & 0x8) == 0x8) {	
 		gColorForeground = COLOR_RGB(31, 41,  0);
 			UI_DrawSmallString(112, Y, "FGC", 3);
