@@ -530,7 +530,7 @@ void MENU_AcceptSetting(void)
 		CHANNELS_SaveVfo();
 		break;
 
-case MENU_MIC_GAIN:
+	case MENU_MIC_GAIN:
 		gExtendedSettings.MicGainLevel = (gSettingCurrentValue + gSettingIndex) % gSettingMaxValues;
 		SETTINGS_SaveGlobals();
 		BK4819_SetMicSensitivityTuning();
