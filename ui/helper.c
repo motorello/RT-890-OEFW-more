@@ -547,7 +547,8 @@ void ConvertRssiToDbm(uint16_t Rssi) {
 		uint8_t bNeg;
 		uint16_t len;
 		
-		RXdBM = (Rssi >> 1) - 177; 
+		//RXdBM = (Rssi >> 1) - 177; // why -177? BK datasheet says -160
+		RXdBM = (Rssi >> 1) - 160; 
 		if (RXdBM < 0) {
 			uRXdBM = -RXdBM;
 			bNeg = true;
