@@ -22,6 +22,7 @@ ENABLE_OPTIMIZED			?= 1
 ENABLE_SLOWER_RSSI_TIMER	?= 1
 ENABLE_AUTO_SWITCH_AM		?= 1
 ENABLE_833_RETUNE			?= 1
+PCB_VER_2_1					?= 0
 
 OBJS =
 # Startup files
@@ -240,6 +241,9 @@ ifeq ($(ENABLE_AUTO_SWITCH_AM), 1)
 endif
 ifeq ($(ENABLE_833_RETUNE), 1)
 	CFLAGS += -DENABLE_833_RETUNE
+endif
+ifeq ($(PCB_VER_2_1),1)
+	CFLAGS += -DPCB_VER_2_1
 endif
 
 all: $(TARGET)
