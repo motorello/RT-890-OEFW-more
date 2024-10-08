@@ -21,6 +21,7 @@
 #include "helper/helper.h"
 #include "radio/settings.h"
 #include "task/vox.h"
+#include "task/am-fix.h"
 #include "ui/gfx.h"
 #include "ui/helper.h"
 #include "ui/main.h"
@@ -193,6 +194,26 @@ void RegEditCheckKeys(void) {
 				break;
             case KEY_3:
 				ChangeRegValue(true);
+				break;
+			case KEY_4:
+				if (gVfoState[!gCurrentVfo].gModulationType == 1 && gExtendedSettings.AmFixEnabled) {
+					gAmFixCapDbm--;
+				}
+				break;
+			case KEY_5:
+				if (gVfoState[!gCurrentVfo].gModulationType == 1 && gExtendedSettings.AmFixEnabled) {
+					gAmFixCapDbm++;
+				}
+				break;
+			case KEY_6:
+				if (gVfoState[!gCurrentVfo].gModulationType == 1 && gExtendedSettings.AmFixEnabled) {
+					gAmFixStandbyIndex--;
+				}
+				break;
+			case KEY_0:
+				if (gVfoState[!gCurrentVfo].gModulationType == 1 && gExtendedSettings.AmFixEnabled) {
+					gAmFixStandbyIndex++;
+				}
 				break;
 			default:
 				break;
