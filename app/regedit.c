@@ -33,12 +33,12 @@
 #endif
 
 static const Registers RegisterTable[] = {
-    {"LNAS ", 0x10, 8, 0b11, 1},
-    {"LNA  ", 0x10, 5, 0b111, 1},
-	{"MIX  ", 0x10, 3, 0b11, 1},
-    {"PGA  ", 0x10, 0, 0b111, 1},
+    {"LNAS ", 0x10,  8, 0b11,  1},
+    {"LNA  ", 0x10,  5, 0b111, 1},
+	{"MIX  ", 0x10,  3, 0b11,  1},
+    {"PGA  ", 0x10,  0, 0b111, 1},
     {"BW   ", 0x43, 12, 0b111, 1},
-    {"WEAK ", 0x43, 9, 0b111, 1},
+    {"WEAK ", 0x43,  9, 0b111, 1},
 };
 
 static const uint8_t RegCount = sizeof(RegisterTable) / sizeof(RegisterTable[0]);
@@ -51,6 +51,7 @@ static uint8_t CurrentReg;
 
 void UI_DrawStatusRegedit(uint8_t Vfo, uint32_t Frequency) {
 
+	gColorForeground = COLOR_GREY;
 	// write current vfo
 	UI_DrawSmallString(2, 86, "VFO", 3);
 	UI_DrawSmallCharacter(2 + 4*5, 86, '0' + Vfo+1);
